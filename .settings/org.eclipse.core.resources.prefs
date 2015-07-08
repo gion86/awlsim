@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+encoding//awlsim/common/compat.py=utf-8
+encoding//awlsim/common/enumeration.py=utf-8
+encoding//awlsim/common/project.py=utf-8
+encoding//awlsim/core/datatypes.py=utf-8
+encoding//awlsim/core/parser.py=utf-8
+encoding//awlsim/core/systemblocks/system_sfb_0.py=utf-8
+encoding//awlsim/core/util.py=utf-8
+encoding//awlsim/gui/guiconfig.py=utf-8
+encoding//awlsim/gui/library.py=utf-8
+encoding//awlsim/gui/libtablewidget.py=utf-8
+encoding//awlsim/gui/mainwindow.py=utf-8
+encoding//awlsim/gui/projectwidget.py=utf-8
+encoding//awlsim/gui/qt_bindings.py=utf-8
+encoding//awlsim/gui/util.py=utf-8
+encoding//awlsim/library/libselection.py=utf-8
