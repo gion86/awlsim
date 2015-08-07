@@ -55,7 +55,7 @@ class BlockTreeModel(QAbstractItemModel):
 	row2id_toplevel = {
 		0	: INDEXID_SRCS,
 #TODO		1	: INDEXID_BLOCKS,
-#TODO		2	: INDEXID_HWMODS,
+		1	: INDEXID_HWMODS,
 	}
 	id2row_toplevel = pivotDict(row2id_toplevel)
 
@@ -84,9 +84,10 @@ class BlockTreeModel(QAbstractItemModel):
 		QAbstractItemModel.__init__(self, parent)
 		self.client = client
 
-		self.__awlSources = []
-		self.__symTabSources = []
-		self.__libSelections = []
+		self.__awlSources = []		# List of AwlSource()s
+		self.__symTabSources = []	# List of SymTabSource()s
+		self.__libSelections = []	# List of AwlLibEntrySelection()s
+		self.__hwMods = []		# List of HwmodDescriptor()s
 
 	def handle_IDENTS(self, msg):
 		def updateData(localList, newList, parentIndex):
@@ -116,7 +117,9 @@ class BlockTreeModel(QAbstractItemModel):
 		pass#TODO FC
 		pass#TODO FB
 		pass#TODO DB
-		pass#TODO hw
+
+		updateData(self.__hwMods, msg.hwMods,
+			   self.idToIndex(self.INDEXID_HWMODS))
 
 	def idToIndex(self, idxId, column = 0):
 		for table in (self.id2row_toplevel,
@@ -164,7 +167,8 @@ class BlockTreeModel(QAbstractItemModel):
 			elif parentId == self.INDEXID_SRCS_LIBSEL:
 				return len(self.__libSelections)
 			elif parentId == self.INDEXID_BLOCKS:
-				return len(self.row2id_blocks)
+#TODO				return len(self.row2id_blocks)
+				pass#TODO
 			elif parentId == self.INDEXID_BLOCKS_OBS:
 				pass#TODO
 			elif parentId == self.INDEXID_BLOCKS_FCS:
@@ -174,7 +178,7 @@ class BlockTreeModel(QAbstractItemModel):
 			elif parentId == self.INDEXID_BLOCKS_DBS:
 				pass#TODO
 			elif parentId == self.INDEXID_HWMODS:
-				pass#TODO
+				return len(self.__hwMods)
 		else:
 			return len(self.row2id_toplevel)
 		return 0
@@ -220,8 +224,7 @@ class BlockTreeModel(QAbstractItemModel):
 		elif idxId in self.id2row_srcs:
 			return self.idToIndex(self.INDEXID_SRCS)
 		elif idxId in self.id2row_blocks:
-#TODO			return self.idToIndex(self.INDEXID_BLOCKS)
-			pass#TODO
+			return self.idToIndex(self.INDEXID_BLOCKS)
 		elif idxIdBase == self.INDEXID_SRCS_AWL_BASE:
 			return self.idToIndex(self.INDEXID_SRCS_AWL)
 		elif idxIdBase == self.INDEXID_SRCS_SYMTAB_BASE:
@@ -237,8 +240,7 @@ class BlockTreeModel(QAbstractItemModel):
 		elif idxIdBase == self.INDEXID_BLOCKS_DBS_BASE:
 			return self.idToIndex(self.INDEXID_BLOCKS_DBS)
 		elif idxIdBase == self.INDEXID_HWMODS_BASE:
-#TODO			return self.idToIndex(self.INDEXID_HWMODS)
-			pass#TODO
+			return self.idToIndex(self.INDEXID_HWMODS)
 		return QModelIndex()
 
 	def data(self, index, role=Qt.DisplayRole):
@@ -273,7 +275,10 @@ class BlockTreeModel(QAbstractItemModel):
 				elif idxIdBase == self.INDEXID_BLOCKS_DBS_BASE:
 					pass#TODO
 				elif idxIdBase == self.INDEXID_HWMODS_BASE:
-					pass#TODO
+					index = idxId - idxIdBase
+					if index >= len(self.__hwMods):
+						return None
+					return self.__hwMods[index].getModuleName()
 
 				names = {
 				  self.INDEXID_SRCS		: "Sources",
@@ -328,7 +333,10 @@ class BlockTreeModel(QAbstractItemModel):
 						return None
 					return self.__symTabSources[index].identHashStr
 				elif idxIdBase == self.INDEXID_SRCS_LIBSEL_BASE:
-					pass#TODO
+					index = idxId - idxIdBase
+					if index >= len(self.__libSelections):
+						return None
+					return self.__libSelections[index].getIdentHashStr()
 				elif idxIdBase == self.INDEXID_BLOCKS_OBS_BASE:
 					pass#TODO
 				elif idxIdBase == self.INDEXID_BLOCKS_FCS_BASE:
@@ -338,7 +346,10 @@ class BlockTreeModel(QAbstractItemModel):
 				elif idxIdBase == self.INDEXID_BLOCKS_DBS_BASE:
 					pass#TODO
 				elif idxIdBase == self.INDEXID_HWMODS_BASE:
-					pass#TODO
+					index = idxId - idxIdBase
+					if index >= len(self.__hwMods):
+						return None
+					return self.__hwMods[index].getIdentHashStr()
 
 		elif role == Qt.DecorationRole:
 			idxId = self.indexToId(index)
